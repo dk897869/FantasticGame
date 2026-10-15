@@ -55,7 +55,11 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
+let MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI || MONGODB_URI.includes('<db_username>') || MONGODB_URI.includes('<db_password>') || MONGODB_URI.includes('<username>')) {
+  MONGODB_URI = 'mongodb+srv://dskv658_db_user:XQzlcGqz4rWF1jQp@cluster0.u56vcyx.mongodb.net/fantasticgame?retryWrites=true&w=majority&appName=Cluster0';
+}
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
