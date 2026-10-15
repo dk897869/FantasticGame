@@ -2,10 +2,19 @@
   publish = "dist"
   command = "npm run build"
 
+[build.environment]
+  NETLIFY_SITE_PREVIEW_DISABLED = "true"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
 
 [build.processing]
   skip_processing = true

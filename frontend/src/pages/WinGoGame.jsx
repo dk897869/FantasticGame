@@ -473,9 +473,9 @@ export const WinGoGame = () => {
 
       {/* Bet Confirmation Modal with 1 RS START and CUSTOM ENTER */}
       {betModalOpen && selectedBet && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm bg-slate-900 border border-amber-500/30 rounded-3xl p-5 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-3 overflow-y-auto">
+          <div className="w-full max-w-sm bg-slate-900 border border-amber-500/40 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3 max-h-[92vh] overflow-y-auto no-scrollbar flex flex-col justify-between my-auto">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-amber-400" />
                 <h3 className="font-black text-white text-base uppercase">
@@ -484,21 +484,21 @@ export const WinGoGame = () => {
               </div>
               <button 
                 onClick={() => setBetModalOpen(false)}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-white p-1"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             {/* Quick Amount Selector starting at ₹1 */}
-            <div className="space-y-1.5">
-              <span className="text-xs text-slate-400 font-bold">Quick Contract Amount</span>
-              <div className="grid grid-cols-6 gap-1.5">
+            <div className="space-y-1">
+              <span className="text-[11px] text-slate-400 font-bold">Quick Contract Amount</span>
+              <div className="grid grid-cols-6 gap-1">
                 {[1, 5, 10, 50, 100, 500].map((amt) => (
                   <button
                     key={amt}
                     onClick={() => setBaseAmount(amt)}
-                    className={`py-2 rounded-xl text-xs font-black transition-all ${
+                    className={`py-1.5 rounded-xl text-xs font-black transition-all ${
                       baseAmount === amt
                         ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20'
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
@@ -516,27 +516,27 @@ export const WinGoGame = () => {
                 Enter Custom Amount (Any amount you want):
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-2.5 text-slate-400 font-black">₹</span>
+                <span className="absolute left-3.5 top-2 text-slate-400 font-black text-sm">₹</span>
                 <input
                   type="number"
                   min={1}
                   value={baseAmount}
                   onChange={(e) => setBaseAmount(Math.max(1, Number(e.target.value)))}
                   placeholder="Enter custom bet (e.g. 1, 2, 25, 100)"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-8 pr-4 py-2 text-sm text-white font-black focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-8 pr-4 py-1.5 text-sm text-white font-black focus:outline-none focus:border-amber-400"
                 />
               </div>
             </div>
 
             {/* Multiplier Chips */}
-            <div className="space-y-1.5">
-              <span className="text-xs text-slate-400 font-bold">Multiplier (X)</span>
-              <div className="grid grid-cols-5 gap-1.5">
+            <div className="space-y-1">
+              <span className="text-[11px] text-slate-400 font-bold">Multiplier (X)</span>
+              <div className="grid grid-cols-5 gap-1">
                 {[1, 5, 10, 20, 50].map((mult) => (
                   <button
                     key={mult}
                     onClick={() => setMultiplier(mult)}
-                    className={`py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    className={`py-1 rounded-xl text-xs font-bold transition-all ${
                       multiplier === mult
                         ? 'bg-amber-400 text-black'
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
@@ -549,39 +549,41 @@ export const WinGoGame = () => {
             </div>
 
             {/* Total Calculation */}
-            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-between text-xs">
+            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-2.5 flex items-center justify-between text-xs">
               <div>
-                <span className="text-slate-400">Total Bet Amount:</span>
+                <span className="text-slate-400 text-[11px]">Total Bet Amount:</span>
                 <div className="text-lg font-black text-amber-400">₹{totalBetAmount}</div>
               </div>
               <div className="text-right">
-                <span className="text-slate-400">Wallet Balance:</span>
+                <span className="text-slate-400 text-[11px]">Wallet Balance:</span>
                 <div className="font-bold text-white">₹{user?.balance || 0}</div>
               </div>
             </div>
 
             {message && (
-              <div className={`p-2.5 rounded-xl text-xs font-bold ${
+              <div className={`p-2 rounded-xl text-xs font-bold ${
                 message.type === 'error' ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300'
               }`}>
                 {message.text}
               </div>
             )}
 
-            {/* Actions */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            {/* Actions (Always visible & dynamic on all phone screens) */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 sticky bottom-0 bg-slate-900 pb-1 mt-1">
               <button
+                type="button"
                 onClick={() => setBetModalOpen(false)}
-                className="py-3 rounded-2xl bg-slate-800 text-slate-300 font-bold text-xs"
+                className="py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs active:scale-95 transition-all"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleConfirmBet}
                 disabled={submitting || currentGameState?.isFrozen}
-                className="py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black text-xs shadow-lg shadow-amber-500/20 active:scale-95 disabled:opacity-50"
+                className="py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5 transition-all"
               >
-                {submitting ? 'Placing...' : `Confirm (₹${totalBetAmount})`}
+                {submitting ? 'Placing...' : `Confirm • ₹${totalBetAmount}`}
               </button>
             </div>
           </div>

@@ -9,42 +9,61 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
       /* Hide all Netlify injected badges, watermarks, drawer containers and feedback widgets */
+      netlify-drawer,
+      #netlify-drawer,
+      .netlify-drawer,
       .netlify-badge,
       [data-netlify-badge],
       #netlify-badge,
       a[href*="netlify.com"],
       div[class*="netlify"],
       iframe[src*="netlify"],
+      iframe[title*="Netlify"],
       div[data-netlify-identity-menu],
-      .netlify-drawer,
       #netlify-drawer-container {
         display: none !important;
         visibility: hidden !important;
         pointer-events: none !important;
         opacity: 0 !important;
-        height: 0 !important;
-        width: 0 !important;
+        height: 0px !important;
+        width: 0px !important;
         position: absolute !important;
-        z-index: -99999 !important;
+        z-index: -999999 !important;
         left: -99999px !important;
+        transform: scale(0) !important;
       }
     </style>
     <script>
       (function() {
-        function removeNetlify() {
-          var badElements = document.querySelectorAll(
-            '.netlify-badge, [data-netlify-badge], #netlify-badge, a[href*="netlify.com"], div[class*="netlify-badge"], iframe[src*="netlify"], #netlify-drawer-container'
+        function purgeNetlify() {
+          // 1. Tag and class based removal
+          var bad = document.querySelectorAll(
+            'netlify-drawer, #netlify-drawer, .netlify-drawer, .netlify-badge, [data-netlify-badge], #netlify-badge, a[href*="netlify.com"], div[class*="netlify-badge"], iframe[src*="netlify"], #netlify-drawer-container'
           );
-          for (var i = 0; i < badElements.length; i++) {
-            badElements[i].remove();
+          for (var i = 0; i < bad.length; i++) {
+            bad[i].remove();
+          }
+
+          // 2. Scan elements containing "Powered by Netlify"
+          var elements = document.querySelectorAll('div, a, span, p, netlify-drawer');
+          for (var j = 0; j < elements.length; j++) {
+            var el = elements[j];
+            if (el.textContent && el.textContent.indexOf('Powered by Netlify') !== -1) {
+              var target = el.closest('div[style*="fixed"], div[style*="position"], netlify-drawer') || el;
+              target.style.display = 'none';
+              try { target.remove(); } catch(e){}
+            }
           }
         }
+
+        purgeNetlify();
         if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', removeNetlify);
-        } else {
-          removeNetlify();
+          document.addEventListener('DOMContentLoaded', purgeNetlify);
         }
-        var obs = new MutationObserver(removeNetlify);
+        window.addEventListener('load', purgeNetlify);
+        setInterval(purgeNetlify, 300);
+
+        var obs = new MutationObserver(purgeNetlify);
         window.addEventListener('load', function() {
           obs.observe(document.body, { childList: true, subtree: true });
         });
