@@ -43,7 +43,7 @@ export const Home = () => {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/20 text-black text-xs font-bold uppercase tracking-wider mb-2">
             <Sparkles size={12} />
-            <span>Welcome Bonus ₹100 Free</span>
+            <span>Welcome Bonus ₹50 Free</span>
           </div>
           <h1 className="text-2xl font-black leading-tight drop-shadow-sm">
             INDIA'S FASTEST <br />COLOR PREDICTION

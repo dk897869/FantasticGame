@@ -1,5 +1,5 @@
-import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { Navbar } from './components/Navbar';
@@ -13,11 +13,24 @@ import { Profile } from './pages/Profile';
 import { Login } from './pages/Login';
 import { AdminDashboard } from './pages/AdminDashboard';
 
+function HashRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (window.location.hash && window.location.hash.startsWith('#/')) {
+      const targetPath = window.location.hash.replace('#', '');
+      window.location.hash = '';
+      navigate(targetPath, { replace: true });
+    }
+  }, [navigate]);
+  return null;
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <SocketProvider>
         <Router>
+          <HashRedirect />
           <div className="min-h-screen bg-[#0b0f19] text-gray-100 flex flex-col font-sans">
             <Navbar />
             <main className="flex-1 w-full">
