@@ -22,7 +22,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const SOCKET_URL = import.meta.env.VITE_API_URL 
       ? import.meta.env.VITE_API_URL.replace('/api', '') 
-      : 'http://localhost:5000';
+      : 'https://fantasticgame.onrender.com';
 
     const s = io(SOCKET_URL, {
       transports: ['websocket', 'polling']
