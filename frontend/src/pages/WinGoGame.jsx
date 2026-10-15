@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { api } from '../services/api';
@@ -23,6 +23,11 @@ export const WinGoGame = () => {
   const [historyTab, setHistoryTab] = useState('game'); // 'game' or 'my'
   const [gameHistory, setGameHistory] = useState([]);
   const [myBets, setMyBets] = useState([]);
+  const myBetsRef = useRef([]);
+
+  useEffect(() => {
+    myBetsRef.current = myBets;
+  }, [myBets]);
   
   // Current active game state based on tab
   const currentGameState = activeTab === '30s' ? gameState30s : gameState1m;
@@ -71,33 +76,103 @@ export const WinGoGame = () => {
 
   // When a round settles
   useEffect(() => {
-    if (lastRoundResult) {
+    if (lastRoundResult && lastRoundResult.outcome) {
+      if (lastRoundResult.gameType && lastRoundResult.gameType !== currentGameType) return;
+
       fetchGameHistory();
-      fetchMyBets();
       refreshUser();
 
-      // Check if user had a bet in this settled period
-      const userBet = myBets.find(b => b.period === lastRoundResult.period);
-      if (userBet) {
-        const didWin = userBet.status === 'won';
+      const winningNumber = Number(lastRoundResult.outcome?.number);
+      const winningColor = (lastRoundResult.outcome?.color || '').toLowerCase();
+      const winningSize = (lastRoundResult.outcome?.size || '').toLowerCase();
+
+      const evaluateSettlement = (betsList) => {
+        const betsForPeriod = (betsList || []).filter(b => b.period === lastRoundResult.period);
+        if (betsForPeriod.length === 0) return;
+
+        let anyWin = false;
+        let totalWin = 0;
+        let totalBet = 0;
+
+        for (const b of betsForPeriod) {
+          totalBet += b.amount;
+          const sel = b.selection.toString().toLowerCase();
+          let bWon = false;
+          let multiplier = 0;
+
+          // If backend already marked it as won
+          if (b.status === 'won') {
+            bWon = true;
+            totalWin += (b.winAmount || Math.floor(b.amount * (b.payoutMultiplier || 2) * 0.98));
+            anyWin = true;
+            continue;
+          }
+
+          // Number match (0-9) -> 9x
+          if (sel === winningNumber.toString()) {
+            bWon = true;
+            multiplier = 9;
+          }
+          // Color match
+          else if (sel === 'green' && (winningColor === 'green' || winningColor === 'green-violet' || [1, 3, 7, 9].includes(winningNumber))) {
+            bWon = true;
+            multiplier = (winningColor === 'green-violet' || winningNumber === 5) ? 1.5 : 2;
+          } else if (sel === 'red' && (winningColor === 'red' || winningColor === 'red-violet' || [2, 4, 6, 8].includes(winningNumber))) {
+            bWon = true;
+            multiplier = (winningColor === 'red-violet' || winningNumber === 0) ? 1.5 : 2;
+          } else if (sel === 'violet' && (winningNumber === 0 || winningNumber === 5 || winningColor.includes('violet'))) {
+            bWon = true;
+            multiplier = 4.5;
+          }
+          // Size match
+          else if (sel === 'big' && (winningSize === 'big' || winningNumber >= 5)) {
+            bWon = true;
+            multiplier = 2;
+          } else if (sel === 'small' && (winningSize === 'small' || winningNumber <= 4)) {
+            bWon = true;
+            multiplier = 2;
+          }
+
+          if (bWon) {
+            anyWin = true;
+            totalWin += Math.floor(b.amount * multiplier * 0.98);
+          }
+        }
+
         setOutcomeModal({
-          won: didWin,
-          winAmount: userBet.winAmount || 0,
-          betAmount: userBet.amount,
-          number: lastRoundResult.outcome?.number,
-          color: lastRoundResult.outcome?.color,
-          size: lastRoundResult.outcome?.size,
+          won: anyWin,
+          winAmount: totalWin,
+          betAmount: totalBet,
+          number: winningNumber,
+          color: winningColor,
+          size: winningSize,
           period: lastRoundResult.period
         });
 
-        if (didWin) {
+        if (anyWin) {
           confetti({
-            particleCount: 80,
-            spread: 80,
+            particleCount: 120,
+            spread: 90,
             origin: { y: 0.6 }
           });
         }
-      }
+      };
+
+      // 1. Evaluate immediately using myBetsRef
+      evaluateSettlement(myBetsRef.current);
+
+      // 2. Fetch fresh bets from server and re-evaluate to ensure 100% sync
+      setTimeout(async () => {
+        try {
+          const data = await api.get(`/game/my-bets?gameType=${currentGameType}&limit=15`);
+          if (data.success && data.bets) {
+            setMyBets(data.bets);
+            evaluateSettlement(data.bets);
+          }
+        } catch (e) {
+          console.error('Fetch bets after round error:', e);
+        }
+      }, 500);
     }
   }, [lastRoundResult]);
 
@@ -138,8 +213,10 @@ export const WinGoGame = () => {
 
       if (res.success) {
         setMessage({ type: 'success', text: `Bet of ₹${totalBetAmount} placed successfully!` });
+        if (res.bet) {
+          setMyBets(prev => [res.bet, ...prev]);
+        }
         refreshUser();
-        fetchMyBets();
         setTimeout(() => {
           setBetModalOpen(false);
         }, 1200);

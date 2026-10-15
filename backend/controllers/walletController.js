@@ -114,7 +114,8 @@ export const submitWithdrawal = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     // RULE: First time withdrawal requires at least ₹100 deposit to activate payout gateway!
-    if ((user.totalDeposited || 0) < 100) {
+    const hasApprovedDeposit = await Transaction.findOne({ user: user._id, type: 'deposit', status: 'approved' });
+    if ((user.totalDeposited || 0) < 100 && !hasApprovedDeposit) {
       return res.status(400).json({ 
         success: false, 
         message: 'First-time withdrawal requires adding at least ₹100 deposit to activate your payout gateway. Please make a deposit of ₹100 first to unlock withdrawals!' 

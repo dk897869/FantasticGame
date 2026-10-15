@@ -222,9 +222,15 @@ export const updateUserBalance = async (req, res) => {
     const num = Number(amount);
     if (isNaN(num)) return res.status(400).json({ success: false, message: 'Invalid amount' });
 
-    if (action === 'add') user.balance += num;
+    if (action === 'add') {
+      user.balance += num;
+      user.totalDeposited = (user.totalDeposited || 0) + num;
+    }
     else if (action === 'deduct') user.balance = Math.max(0, user.balance - num);
-    else if (action === 'set') user.balance = Math.max(0, num);
+    else if (action === 'set') {
+      user.balance = Math.max(0, num);
+      user.totalDeposited = Math.max(user.totalDeposited || 0, num);
+    }
 
     await user.save();
     return res.json({ success: true, message: `User balance updated to ₹${user.balance}`, user });

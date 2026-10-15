@@ -30,14 +30,23 @@ export const Withdraw = () => {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
   const [history, setHistory] = useState([]);
+  const [hasDeposited, setHasDeposited] = useState(false);
 
-  const isEligible = (user?.totalDeposited || 0) >= 100;
+  // Once deposited, banner disappears permanently
+  const isEligible = (user?.totalDeposited || 0) >= 100 || (user?.totalDeposited || 0) > 0 || hasDeposited;
 
   const fetchHistory = async () => {
     try {
       const data = await api.get('/wallet/transactions?type=withdrawal');
       if (data.success) {
         setHistory(data.transactions);
+      }
+      const depData = await api.get('/wallet/transactions?type=deposit');
+      if (depData.success && depData.transactions?.length > 0) {
+        const approvedOrAny = depData.transactions.some(d => d.status === 'approved' || d.status === 'completed');
+        if (approvedOrAny || (user?.totalDeposited || 0) > 0) {
+          setHasDeposited(true);
+        }
       }
     } catch (err) {
       console.error(err);
