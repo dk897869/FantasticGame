@@ -15,7 +15,7 @@ export const getPaymentConfig = async (req, res) => {
 
     const { amount = 500, method = 'phonepe' } = req.query;
     const payeeUpi = setting.upiId || 'deepakut43287@naviaxis';
-    const merchantName = setting.merchantName || 'Fantastic Game';
+    const merchantName = setting.merchantName || 'Fantastic Game Official';
     const depositAmount = Number(amount) || 500;
 
     const timestamp = Date.now().toString().slice(-6);
@@ -23,14 +23,14 @@ export const getPaymentConfig = async (req, res) => {
     const orderId = `FG${timestamp}${randomHex}`;
     const orderNote = `Fantastic Game Deposit ${orderId}`;
 
-    const baseUpiUri = `upi://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`;
+    const baseUpiUri = `upi://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&mc=5815&mode=02&purpose=00&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`;
 
     const appLinks = {
-      phonepe: `phonepe://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
-      gpay: `tez://upi/pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
-      paytm: `paytmmp://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
-      bhim: `upi://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
-      navi: `navi://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
+      phonepe: `phonepe://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&mc=5815&mode=02&purpose=00&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
+      gpay: `tez://upi/pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&mc=5815&mode=02&purpose=00&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
+      paytm: `paytmmp://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&mc=5815&mode=02&purpose=00&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
+      bhim: `upi://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&mc=5815&mode=02&purpose=00&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
+      navi: `navi://pay?pa=${payeeUpi}&pn=${encodeURIComponent(merchantName)}&mc=5815&mode=02&purpose=00&am=${depositAmount}&cu=INR&tr=${orderId}&tn=${encodeURIComponent(orderNote)}`,
       generic: baseUpiUri
     };
 

@@ -49,3 +49,24 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Eradicate Netlify badge / drawer overlay */
+.netlify-badge,
+[data-netlify-badge],
+#netlify-badge,
+a[href*="netlify.com"],
+div[class*="netlify"],
+iframe[src*="netlify"],
+div[data-netlify-identity-menu],
+.netlify-drawer,
+#netlify-drawer-container {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  position: absolute !important;
+  z-index: -99999 !important;
+  left: -99999px !important;
+}

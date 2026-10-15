@@ -12,7 +12,10 @@ import {
   RotateCcw,
   History,
   QrCode,
-  ArrowRight
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Lock
 } from 'lucide-react';
 
 export const Deposit = () => {
@@ -22,6 +25,7 @@ export const Deposit = () => {
   const [utrNumber, setUtrNumber] = useState('');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [copiedAmount, setCopiedAmount] = useState(false);
+  const [showUpi, setShowUpi] = useState(false);
   
   // Checkout session
   const [config, setConfig] = useState(null);
@@ -256,11 +260,20 @@ export const Deposit = () => {
           ) : (
             <div className="relative p-3 bg-white rounded-3xl shadow-xl max-w-[220px]">
               {config?.qrCodeUrl ? (
-                <img
-                  src={config.qrCodeUrl}
-                  alt="Dynamic Payment QR"
-                  className="w-full h-auto rounded-2xl"
-                />
+                <div className="relative">
+                  <img
+                    src={config.qrCodeUrl}
+                    alt="Dynamic Payment QR"
+                    className="w-full h-auto rounded-2xl"
+                  />
+                  {/* Center Brand Badge on QR Code */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-10 h-10 rounded-xl bg-slate-900 border-2 border-amber-400 flex flex-col items-center justify-center shadow-lg shadow-black/60">
+                      <span className="text-[11px] font-black text-amber-400 leading-none">FG</span>
+                      <span className="text-[6px] font-extrabold text-white tracking-widest leading-none mt-0.5">GAME</span>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="w-52 h-52 flex items-center justify-center text-slate-800 text-xs">
                   Loading QR...
@@ -268,8 +281,9 @@ export const Deposit = () => {
               )}
               {/* Overlay brand badge on QR */}
               <div className="absolute inset-x-0 bottom-1 text-center">
-                <span className="inline-block bg-slate-900/90 text-[9px] text-amber-400 font-black px-2 py-0.5 rounded-full shadow">
-                  FANTASTIC GAME
+                <span className="inline-flex items-center gap-1 bg-slate-900/95 text-[9px] text-amber-400 font-black px-2.5 py-0.5 rounded-full shadow border border-amber-400/30">
+                  <ShieldCheck size={11} className="text-emerald-400" />
+                  <span>FANTASTIC GAME OFFICIAL</span>
                 </span>
               </div>
             </div>
@@ -280,23 +294,55 @@ export const Deposit = () => {
           </p>
         </div>
 
-        {/* Amount & UPI Details Copy Box */}
+        {/* Merchant & UPI Details Box (Private info blurred & protected) */}
         <div className="space-y-2">
-          {/* Copy UPI ID */}
-          <div className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-2xl px-3.5 py-2.5 text-xs">
-            <div className="overflow-hidden">
-              <span className="text-[10px] text-slate-500 block">UPI ID:</span>
-              <span className="font-mono font-bold text-amber-400 truncate block text-xs">
-                {config?.upiId || 'deepakut43287@naviaxis'}
+          {/* Verified Official Merchant & Blurred Gateway */}
+          <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3 text-xs space-y-2.5 shadow-inner">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] text-slate-500 block font-medium">Merchant Payee:</span>
+                <span className="font-black text-amber-400 flex items-center gap-1.5 text-xs">
+                  <ShieldCheck size={15} className="text-emerald-400 shrink-0" />
+                  <span>FANTASTIC GAME OFFICIAL</span>
+                </span>
+              </div>
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/20 flex items-center gap-1">
+                <Lock size={10} />
+                <span>Encrypted Gateway</span>
               </span>
             </div>
-            <button
-              onClick={() => copyText(config?.upiId || 'deepakut43287@naviaxis', 'upi')}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 shrink-0 active:scale-95"
-            >
-              {copiedUpi ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-              <span>{copiedUpi ? 'Copied' : 'Copy UPI'}</span>
-            </button>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-900">
+              <div className="overflow-hidden pr-2">
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-slate-500 block">Game UPI VPA:</span>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowUpi(!showUpi)}
+                    className="text-[10px] text-amber-400/80 hover:text-amber-400 font-bold flex items-center gap-0.5 ml-1"
+                  >
+                    {showUpi ? <EyeOff size={11} /> : <Eye size={11} />}
+                    <span>{showUpi ? 'Hide' : 'Show'}</span>
+                  </button>
+                </div>
+                <div className="mt-0.5">
+                  <span className={`font-mono text-xs font-bold transition-all ${
+                    showUpi ? 'text-slate-200 select-all filter-none' : 'text-slate-500 blur-[4.5px] select-none'
+                  }`}>
+                    {config?.upiId || 'deepakut43287@naviaxis'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => copyText(config?.upiId || 'deepakut43287@naviaxis', 'upi')}
+                className="px-3 py-2 rounded-xl bg-amber-500 text-black hover:bg-amber-400 text-xs font-black flex items-center gap-1.5 shrink-0 active:scale-95 shadow-md shadow-amber-500/20"
+              >
+                {copiedUpi ? <Check size={14} strokeWidth={3} className="text-black" /> : <Copy size={14} />}
+                <span>{copiedUpi ? 'Copied!' : 'Copy UPI'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Copy Exact Amount */}
@@ -308,6 +354,7 @@ export const Deposit = () => {
               </span>
             </div>
             <button
+              type="button"
               onClick={() => copyText(amount.toString(), 'amount')}
               className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 shrink-0 active:scale-95"
             >

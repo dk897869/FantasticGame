@@ -12,8 +12,8 @@ export const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#0f172a]/95 backdrop-blur-lg border-t border-slate-800 py-1.5 px-3">
-      <div className="max-w-md mx-auto flex items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0f172a]/98 backdrop-blur-xl border-t border-slate-800/80 py-2 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_25px_rgba(0,0,0,0.6)]">
+      <div className="max-w-md mx-auto flex items-center justify-between px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -21,19 +21,21 @@ export const BottomNav = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all duration-200 ${
+                `flex-1 flex flex-col items-center justify-center py-1 rounded-2xl transition-all duration-200 select-none ${
                   isActive
-                    ? 'text-amber-400 font-bold scale-105'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'text-amber-400 font-extrabold scale-105'
+                    : 'text-slate-400 hover:text-slate-200 font-medium'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-amber-400/10' : ''}`}>
-                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  <div className={`p-1.5 rounded-2xl transition-all ${isActive ? 'bg-amber-400/15 shadow-sm shadow-amber-400/20' : ''}`}>
+                    <Icon size={21} strokeWidth={isActive ? 2.6 : 2} />
                   </div>
-                  <span className="text-[11px] mt-0.5">{item.label}</span>
+                  <span className={`text-[11px] mt-0.5 tracking-tight ${isActive ? 'text-amber-300 font-black' : 'text-slate-400'}`}>
+                    {item.label}
+                  </span>
                 </>
               )}
             </NavLink>
